@@ -7,13 +7,18 @@ describe DockingStation do
     expect(bike).not_to be_broken
   end
   it 'can dock a bike' do
-    expect(subject.dock(:bike)).to eq :bike
+    expect(subject.dock(:bike)).to be nil
   end
   it 'raises error when no bike available' do
     expect { subject.release_bike }.to raise_error 'No Bikes Available'
   end
   it 'raises error when full' do
-    subject.dock double :bike
+    DockingStation::DEFAULT_CAPACITY.times { subject.dock double :bike }
     expect { subject.dock double :bike }.to raise_error 'Station Full'
+  end
+  it 'does not release broken bikes' do
+    broken_bike = double :bike, broken?: true
+    subject.dock broken_bike
+    expect { subject.release_bike }.to raise_error 'No Bikes Available'
   end
 end
